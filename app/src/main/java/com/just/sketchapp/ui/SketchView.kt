@@ -1,11 +1,13 @@
-package com.just.sketchapp
+package com.just.sketchapp.ui
 
 import android.content.Context
 import android.graphics.*
 import android.view.View
 import android.util.AttributeSet
 import android.util.DisplayMetrics
+import android.util.Log
 import android.view.MotionEvent
+import com.just.sketchapp.data.FingerPath
 import kotlin.math.absoluteValue
 
 class SketchView(context: Context, attr: AttributeSet?): View(context, attr) {
@@ -20,6 +22,7 @@ class SketchView(context: Context, attr: AttributeSet?): View(context, attr) {
     private lateinit var path: Path
     private var paint: Paint
     private lateinit var bitmap: Bitmap
+
     private lateinit var mCanvas: Canvas
     private var bitmapPaint: Paint = Paint(Paint.DITHER_FLAG)
 
@@ -35,13 +38,8 @@ class SketchView(context: Context, attr: AttributeSet?): View(context, attr) {
         paint.xfermode = null
         paint.alpha = 0xff
 
-    }
 
-    fun initMetrics(metrics: DisplayMetrics){
-        val height = metrics.heightPixels
-        val width = metrics.widthPixels
-
-        bitmap = Bitmap.createBitmap(width,height,Bitmap.Config.ARGB_8888)
+        bitmap = Bitmap.createBitmap(context.resources.displayMetrics.widthPixels, context.resources.displayMetrics.heightPixels, Bitmap.Config.ARGB_8888)
         mCanvas = Canvas(bitmap)
     }
 

@@ -1,4 +1,4 @@
-package com.just.sketchapp
+package com.just.sketchapp.data
 
 import android.graphics.Path
 
