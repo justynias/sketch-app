@@ -4,19 +4,20 @@ import android.content.Context
 import android.graphics.*
 import android.view.View
 import android.util.AttributeSet
-import android.util.DisplayMetrics
-import android.util.Log
 import android.view.MotionEvent
 import com.just.sketchapp.data.FingerPath
 import kotlin.math.absoluteValue
 import android.graphics.Bitmap
-import java.io.FileOutputStream
+
+import androidx.annotation.ColorInt
 
 
-class SketchView(context: Context, attr: AttributeSet?): View(context, attr) {
 
-    val brushSize: Int = 20
-    val brushColor : Int  = Color.RED
+
+class CanvasView(context: Context, attr: AttributeSet?): View(context, attr){
+
+    var brushSize: Int = 0
+    var brushColor : Int  = Color.WHITE
     val backgroundColor: Int = Color.WHITE
     val touchTolerance:Float = 4.0f
     private var mX :Float? = null
@@ -24,14 +25,22 @@ class SketchView(context: Context, attr: AttributeSet?): View(context, attr) {
     private var paths  = mutableListOf<FingerPath>()
     private lateinit var path: Path
     private var paint: Paint
-    private lateinit var bitmap: Bitmap
-
-    private lateinit var mCanvas: Canvas
+    private val bitmap: Bitmap
+    private val mCanvas: Canvas
     private var bitmapPaint: Paint = Paint(Paint.DITHER_FLAG)
 
 
+    fun setColor(@ColorInt color: Int) {
+        brushColor = color
+        paint.color = brushColor
+    }
+
+    fun setSize(size: Int) {
+        brushSize = size
+    }
 
     init{
+
         paint= Paint()
         paint.isAntiAlias = true
         paint.isDither = true
@@ -42,15 +51,15 @@ class SketchView(context: Context, attr: AttributeSet?): View(context, attr) {
         paint.xfermode = null
         paint.alpha = 0xff
 
-
         bitmap = Bitmap.createBitmap(context.resources.displayMetrics.widthPixels, context.resources.displayMetrics.heightPixels, Bitmap.Config.ARGB_8888)
         mCanvas = Canvas(bitmap)
+
     }
 
 
     private fun touchStart(x: Float, y: Float){
         path = Path()
-        val fp = FingerPath(brushColor, brushSize, path!!)
+        val fp = FingerPath(brushColor, brushSize, path)
 
         paths.add(fp)
 
@@ -61,13 +70,12 @@ class SketchView(context: Context, attr: AttributeSet?): View(context, attr) {
     }
 
     private fun touchMove(x: Float, y:Float) {
-        //check mx, my ?
         (mX != null && mY != null).let {
             val dx = (x - mX!!).absoluteValue
             val dy = (y - mY!!).absoluteValue
 
-            if (dx!! >= touchTolerance && dy >= touchTolerance) {
-                path?.quadTo(mX!!, mY!!, (x + mX!!) / 2, (y + mY!!) / 2)
+            if (dx >= touchTolerance && dy >= touchTolerance) {
+                path.quadTo(mX!!, mY!!, (x + mX!!) / 2, (y + mY!!) / 2)
                 mX = x
                 mY = y
             }
@@ -76,7 +84,7 @@ class SketchView(context: Context, attr: AttributeSet?): View(context, attr) {
 
     private fun touchUp(){
         (mX != null && mY != null ).let {
-            path?.lineTo(mX!!, mY!!)
+            path.lineTo(mX!!, mY!!)
         }
     }
 
@@ -85,7 +93,7 @@ class SketchView(context: Context, attr: AttributeSet?): View(context, attr) {
         canvas.save()
         mCanvas.drawColor(backgroundColor)
 
-        paths?.forEach {
+        paths.forEach {
             paint.color = it.color
             paint.strokeWidth = it.brushSize.toFloat()
             paint.maskFilter = null

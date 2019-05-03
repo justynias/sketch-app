@@ -1,15 +1,12 @@
 package com.just.sketchapp.ui
 
 import android.Manifest
-import android.content.ContentResolver
-import android.content.Context
 import android.content.DialogInterface
 import android.content.pm.PackageManager
 import android.graphics.Bitmap
 import android.graphics.Canvas
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
-import android.util.DisplayMetrics
 import android.util.Log
 import android.widget.ImageButton
 import androidx.databinding.DataBindingUtil
@@ -21,27 +18,19 @@ import com.skydoves.colorpickerview.listeners.ColorEnvelopeListener
 import org.kodein.di.KodeinAware
 import org.kodein.di.android.kodein
 import org.kodein.di.generic.instance
-import java.io.FileOutputStream
-import java.io.IOException
-import java.io.File.separator
-import android.os.Environment.DIRECTORY_PICTURES
-import android.os.Environment.getExternalStoragePublicDirectory
-import android.os.Environment
 import android.provider.MediaStore
 import android.view.View
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
-import androidx.core.net.toUri
+import com.just.sketchapp.BR
 import com.just.sketchapp.R
-import java.io.File
 
 private const val MY_PERMISSION_WRITE_EXTERNAL_STORAGE = 1
 
 
 class MainActivity : AppCompatActivity(), KodeinAware {
 
-//temporary
-    lateinit var sketchView: SketchView
+
     override val kodein by kodein()
     private val viewModelFactory: ViewModelFactory by instance()
     private lateinit var mainViewModel: MainViewModel
@@ -50,9 +39,6 @@ class MainActivity : AppCompatActivity(), KodeinAware {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
 
-
-        //initialize custom sketch view
-       sketchView = findViewById<SketchView>(R.id.sketchView)
 
 
 
@@ -63,7 +49,10 @@ class MainActivity : AppCompatActivity(), KodeinAware {
         ).apply {
             this.lifecycleOwner = this@MainActivity
             this.viewModel = mainViewModel
+            this.setVariable(BR.viewModel, mainViewModel)
+            this.executePendingBindings()
         }
+
 
 
         val imageButton = findViewById<ImageButton>(R.id.color)
@@ -81,7 +70,10 @@ class MainActivity : AppCompatActivity(), KodeinAware {
             })
               .setPreferenceName("MyColorPicker")
             .show()
-            testExport()
+           // mainViewModel.setColor(Color.BLUE)
+            //mainViewModel.setSize(50)
+
+            //testExport()
 
         }
 
@@ -110,14 +102,12 @@ class MainActivity : AppCompatActivity(), KodeinAware {
     fun testExport(){
 
         requestWritePermission()
-        val path = Environment.getExternalStorageDirectory().toString() + File.separator + "test"
         if(hasFilePermission()) {
 
             try {
 
-              val pics = findViewById<SketchView>(R.id.sketchView)
+              val pics = findViewById<CanvasView>(R.id.canvasView)
                 val uri = MediaStore.Images.Media.insertImage(contentResolver, createBitmapFromView(pics),"new", null )
-                val inp = contentResolver.openInputStream(uri.toUri())
 
             } catch (e: Exception) {
                 Log.d("SCIEZKA", e.message)
