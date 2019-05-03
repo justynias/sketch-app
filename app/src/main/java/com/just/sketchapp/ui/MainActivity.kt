@@ -24,6 +24,7 @@ import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
 import com.just.sketchapp.BR
 import com.just.sketchapp.R
+import com.just.sketchapp.dialog.ColorPickerManager
 
 private const val MY_PERMISSION_WRITE_EXTERNAL_STORAGE = 1
 
@@ -34,12 +35,12 @@ class MainActivity : AppCompatActivity(), KodeinAware {
     override val kodein by kodein()
     private val viewModelFactory: ViewModelFactory by instance()
     private lateinit var mainViewModel: MainViewModel
+    private val colorPickerManager: ColorPickerManager by instance()
+
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
-
-
 
 
         //init viewmodel and data binding
@@ -54,29 +55,13 @@ class MainActivity : AppCompatActivity(), KodeinAware {
         }
 
 
-
+        //init button listener
         val imageButton = findViewById<ImageButton>(R.id.color)
         imageButton?.setOnClickListener {
-          ColorPickerDialog.Builder(this, R.style.Theme_AppCompat_Dialog_Alert)
-            .setTitle("Choose your brush color")
-              .setPositiveButton("ok", object: ColorEnvelopeListener {
-                override fun onColorSelected(envelope: ColorEnvelope?, fromUser: Boolean) {
-                    Log.d("COLOR PICKED", envelope?.hexCode)
-                } })
-              .setNegativeButton("cancel", object: DialogInterface.OnClickListener{
-                override fun onClick(dialog: DialogInterface?, which: Int) {
-                    dialog?.dismiss()
-                }
-            })
-              .setPreferenceName("MyColorPicker")
-            .show()
-           // mainViewModel.setColor(Color.BLUE)
-            //mainViewModel.setSize(50)
-
-            //testExport()
-
+            colorPickerManager.showColorPicker(this) {
+                mainViewModel.setColor(it)
+            }
         }
-
     }
     private fun requestWritePermission() {
         ActivityCompat.requestPermissions(
@@ -85,7 +70,6 @@ class MainActivity : AppCompatActivity(), KodeinAware {
             1
         )
     }
-
 
     private fun hasFilePermission(): Boolean {
         return ContextCompat.checkSelfPermission(
