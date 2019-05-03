@@ -57,6 +57,11 @@ class CanvasView(context: Context, attr: AttributeSet?): View(context, attr){
     }
 
 
+    fun clearCanvas(){
+
+        paths.clear()
+        invalidate()
+    }
     private fun touchStart(x: Float, y: Float){
         path = Path()
         val fp = FingerPath(brushColor, brushSize, path)

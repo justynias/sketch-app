@@ -41,6 +41,7 @@
                     android:weightSum="6">
 
                 <ImageButton
+                        android:id="@+id/cancel"
                         android:layout_width="0dp"
                         android:layout_height="match_parent"
                         android:clickable="true"

@@ -56,12 +56,19 @@ class MainActivity : AppCompatActivity(), KodeinAware {
 
 
         //init button listener
-        val imageButton = findViewById<ImageButton>(R.id.color)
-        imageButton?.setOnClickListener {
+        val colorButton = findViewById<ImageButton>(R.id.color)
+        colorButton?.setOnClickListener {
             colorPickerManager.showColorPicker(this) {
                 mainViewModel.setColor(it)
             }
         }
+        //need another solution
+        val cancelButton = findViewById<ImageButton>(R.id.cancel)
+        cancelButton?.setOnClickListener{
+            val view = findViewById<CanvasView>(R.id.canvasView)
+            view.clearCanvas()
+        }
+
     }
     private fun requestWritePermission() {
         ActivityCompat.requestPermissions(
