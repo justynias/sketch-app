@@ -9,6 +9,9 @@ import android.util.Log
 import android.view.MotionEvent
 import com.just.sketchapp.data.FingerPath
 import kotlin.math.absoluteValue
+import android.graphics.Bitmap
+import java.io.FileOutputStream
+
 
 class SketchView(context: Context, attr: AttributeSet?): View(context, attr) {
 
@@ -25,6 +28,7 @@ class SketchView(context: Context, attr: AttributeSet?): View(context, attr) {
 
     private lateinit var mCanvas: Canvas
     private var bitmapPaint: Paint = Paint(Paint.DITHER_FLAG)
+
 
 
     init{
@@ -88,7 +92,7 @@ class SketchView(context: Context, attr: AttributeSet?): View(context, attr) {
 
             mCanvas.drawPath(it.path, paint)
         }
-        canvas.drawBitmap(bitmap, 0.0f, 0.0f,  bitmapPaint)
+     canvas.drawBitmap(bitmap, 0.0f, 0.0f,  bitmapPaint)
     }
 
     override fun onTouchEvent(event: MotionEvent): Boolean {
