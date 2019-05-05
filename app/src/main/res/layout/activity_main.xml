@@ -20,8 +20,10 @@
                 app:layout_constraintHeight_percent=".9"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toTopOf="parent"
+                app:size="@{viewModel.size}"
                 app:color="@{viewModel.color}"
-                app:size="@{viewModel.size}"/>
+                app:paths="@{viewModel.paths}"
+        />
 
 
         <androidx.appcompat.widget.Toolbar
@@ -48,7 +50,8 @@
                         android:focusable="true"
                         android:layout_weight="1"
                         android:src="@drawable/ic_cancel"
-                        android:background="@color/colorPrimaryLight"/>
+                        android:background="@color/colorPrimaryLight"
+                        />
                 <TextView android:layout_width="0dp"
                           android:layout_height="match_parent"
                           android:layout_weight="0.7"

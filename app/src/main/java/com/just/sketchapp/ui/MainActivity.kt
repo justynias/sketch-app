@@ -65,8 +65,10 @@ class MainActivity : AppCompatActivity(), KodeinAware {
         //need another solution
         val cancelButton = findViewById<ImageButton>(R.id.cancel)
         cancelButton?.setOnClickListener{
-            val view = findViewById<CanvasView>(R.id.canvasView)
-            view.clearCanvas()
+//            val view = findViewById<CanvasView>(R.id.canvasView)
+//            view.clearCanvas()
+
+            mainViewModel.clearPaths()
         }
 
     }
