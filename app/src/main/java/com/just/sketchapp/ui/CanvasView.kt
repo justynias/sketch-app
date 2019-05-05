@@ -8,6 +8,7 @@ import android.view.MotionEvent
 import com.just.sketchapp.data.FingerPath
 import kotlin.math.absoluteValue
 import android.graphics.Bitmap
+import android.provider.MediaStore
 import android.util.Log
 
 import androidx.annotation.ColorInt
@@ -15,34 +16,37 @@ import androidx.databinding.InverseMethod
 import androidx.lifecycle.LifecycleOwner
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.Observer
+import com.just.sketchapp.R
 import java.lang.Exception
 
 
 class CanvasView(context: Context, attr: AttributeSet?): View(context, attr){
 
-    var brushSize: Int = 0
-    var brushColor : Int  = Color.WHITE
-    val backgroundColor: Int = Color.WHITE
-    val touchTolerance:Float = 4.0f
+    private var brushSize: Int = 0
+    private var brushColor : Int  = Color.WHITE
+    private val backgroundColor: Int = Color.WHITE
+    private val touchTolerance:Float = 4.0f
     private var mX :Float? = null
     private var mY :Float? = null
     private var paths  = mutableListOf<FingerPath>()
     private lateinit var path: Path
     private var paint: Paint
-    private val bitmap: Bitmap
+    private lateinit var bitmap: Bitmap
     private val mCanvas: Canvas
     private var bitmapPaint: Paint = Paint(Paint.DITHER_FLAG)
-   // private lateinit var viewModel:MainViewModel
-//
-//    fun setViewModel(vm: MainViewModel) {
-//        viewModel = vm
-//        brushSize = viewModel.getSize().value as Int
-//
-//    }
+
+
+
+    fun createBitmapFromView(): Canvas{
+
+         mCanvas.drawBitmap(bitmap, 0.0f, 0.0f,  bitmapPaint)
+        return mCanvas
+    }
 
     fun setColor(@ColorInt color: Int) {
         brushColor = color
         paint.color = brushColor
+
     }
 
     fun setSize(size: Int) {
@@ -50,11 +54,11 @@ class CanvasView(context: Context, attr: AttributeSet?): View(context, attr){
     }
 
     fun setPaths(path: MutableList<FingerPath>) {
-        Log.d("PATHS View", paths.size.toString())
         paths = path
         invalidate()
     }
-    fun getPaths(): MutableList<FingerPath> = paths
+
+
 
     init{
 
@@ -74,11 +78,6 @@ class CanvasView(context: Context, attr: AttributeSet?): View(context, attr){
     }
 
 
-    fun clearCanvas(){
-
-        paths.clear()
-        invalidate()
-    }
     private fun touchStart(x: Float, y: Float){
         path = Path()
         val fp = FingerPath(brushColor, brushSize, path)

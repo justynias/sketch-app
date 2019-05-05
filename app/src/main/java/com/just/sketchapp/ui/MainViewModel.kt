@@ -1,4 +1,6 @@
 package com.just.sketchapp.ui
+import android.app.Application
+import android.graphics.Bitmap
 import android.graphics.Color
 import android.widget.SeekBar
 import androidx.lifecycle.LiveData
@@ -16,7 +18,8 @@ class MainViewModel(private val paintModel: PaintModel): ViewModel() {
     init{
         _color.value = Color.RED
         _paths.value = mutableListOf<FingerPath>()
-        //_size.value =30
+        _size.value =30
+
     }
 
     fun getColor(): LiveData<Int?> = _color

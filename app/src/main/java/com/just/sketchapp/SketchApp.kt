@@ -2,6 +2,7 @@ package com.just.sketchapp
 
 import android.app.Application
 import com.just.sketchapp.data.PaintModel
+import com.just.sketchapp.dialog.BitmapExportManager
 import com.just.sketchapp.dialog.ColorPickerManager
 import com.just.sketchapp.ui.ViewModelFactory
 import org.kodein.di.Kodein
@@ -19,5 +20,7 @@ class SketchApp: Application(), KodeinAware {
         bind () from provider { ViewModelFactory(instance()) }
         bind() from singleton { PaintModel() }
         bind() from singleton { ColorPickerManager() }
+        bind() from singleton { BitmapExportManager() }
+
     }
 }

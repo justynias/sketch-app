@@ -19,11 +19,13 @@ import org.kodein.di.KodeinAware
 import org.kodein.di.android.kodein
 import org.kodein.di.generic.instance
 import android.provider.MediaStore
+import android.util.DisplayMetrics
 import android.view.View
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
 import com.just.sketchapp.BR
 import com.just.sketchapp.R
+import com.just.sketchapp.dialog.BitmapExportManager
 import com.just.sketchapp.dialog.ColorPickerManager
 
 private const val MY_PERMISSION_WRITE_EXTERNAL_STORAGE = 1
@@ -36,6 +38,8 @@ class MainActivity : AppCompatActivity(), KodeinAware {
     private val viewModelFactory: ViewModelFactory by instance()
     private lateinit var mainViewModel: MainViewModel
     private val colorPickerManager: ColorPickerManager by instance()
+    private val bitmapExportManager: BitmapExportManager by instance()
+
 
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -62,15 +66,21 @@ class MainActivity : AppCompatActivity(), KodeinAware {
                 mainViewModel.setColor(it)
             }
         }
-        //need another solution
         val cancelButton = findViewById<ImageButton>(R.id.cancel)
         cancelButton?.setOnClickListener{
-//            val view = findViewById<CanvasView>(R.id.canvasView)
-//            view.clearCanvas()
-
             mainViewModel.clearPaths()
         }
+        val downloadButton = findViewById<ImageButton>(R.id.download)
+        downloadButton?.setOnClickListener{
+            val pics = findViewById<CanvasView>(R.id.canvasView)
+            requestWritePermission() // need to refactor requests
+            if(hasFilePermission()){
+                val metrics = DisplayMetrics()
+                windowManager.defaultDisplay.getMetrics(metrics)
+                bitmapExportManager.saveBitmap(this, mainViewModel.getPaths().value, metrics.widthPixels, metrics.heightPixels )
 
+            }
+        }
     }
     private fun requestWritePermission() {
         ActivityCompat.requestPermissions(
@@ -87,25 +97,10 @@ class MainActivity : AppCompatActivity(), KodeinAware {
         )  == PackageManager.PERMISSION_GRANTED
     }
 
-    private fun createBitmapFromView(view: View): Bitmap{
-        val bitmap = Bitmap.createBitmap(view.measuredWidth, view.measuredHeight, Bitmap.Config.ARGB_8888)
-        view.draw(Canvas(bitmap))
-        return bitmap
-    }
-    fun testExport(){
+//    private fun createBitmapFromView(view: View): Bitmap{
+//        val bitmap = Bitmap.createBitmap(view.measuredWidth, view.measuredHeight, Bitmap.Config.ARGB_8888)
+//        view.draw(Canvas(bitmap))
+//        return bitmap
+//    }
 
-        requestWritePermission()
-        if(hasFilePermission()) {
-
-            try {
-
-              val pics = findViewById<CanvasView>(R.id.canvasView)
-                val uri = MediaStore.Images.Media.insertImage(contentResolver, createBitmapFromView(pics),"new", null )
-
-            } catch (e: Exception) {
-                Log.d("SCIEZKA", e.message)
-            }
-        }
-
-    }
 }
