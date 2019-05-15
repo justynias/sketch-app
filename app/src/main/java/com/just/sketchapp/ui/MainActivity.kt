@@ -1,10 +1,13 @@
 package com.just.sketchapp.ui
 
 import android.Manifest
+import android.content.Context
 import android.content.DialogInterface
 import android.content.pm.PackageManager
-import android.graphics.Bitmap
-import android.graphics.Canvas
+import android.hardware.Sensor
+import android.hardware.SensorEventListener
+import android.hardware.SensorListener
+import android.hardware.SensorManager
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.util.Log
@@ -12,26 +15,25 @@ import android.widget.ImageButton
 import androidx.databinding.DataBindingUtil
 import androidx.lifecycle.ViewModelProviders
 import com.just.sketchapp.databinding.ActivityMainBinding
-import com.skydoves.colorpickerview.ColorEnvelope
-import com.skydoves.colorpickerview.ColorPickerDialog
-import com.skydoves.colorpickerview.listeners.ColorEnvelopeListener
 import org.kodein.di.KodeinAware
 import org.kodein.di.android.kodein
 import org.kodein.di.generic.instance
-import android.provider.MediaStore
 import android.util.DisplayMetrics
-import android.view.View
+import androidx.appcompat.app.AlertDialog
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
-import com.just.sketchapp.BR
+import androidx.databinding.library.baseAdapters.BR
 import com.just.sketchapp.R
 import com.just.sketchapp.dialog.BitmapExportManager
 import com.just.sketchapp.dialog.ColorPickerManager
+import com.todo.shakeit.core.ShakeDetector
+import com.todo.shakeit.core.ShakeListener
+
 
 private const val MY_PERMISSION_WRITE_EXTERNAL_STORAGE = 1
 
 
-class MainActivity : AppCompatActivity(), KodeinAware {
+class MainActivity : AppCompatActivity(), KodeinAware,  ShakeListener {
 
 
     override val kodein by kodein()
@@ -39,13 +41,11 @@ class MainActivity : AppCompatActivity(), KodeinAware {
     private lateinit var mainViewModel: MainViewModel
     private val colorPickerManager: ColorPickerManager by instance()
     private val bitmapExportManager: BitmapExportManager by instance()
-
-
+    private lateinit var dialog: AlertDialog
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
-
 
         //init viewmodel and data binding
         mainViewModel = ViewModelProviders.of(this, viewModelFactory).get(MainViewModel::class.java)
@@ -59,6 +59,7 @@ class MainActivity : AppCompatActivity(), KodeinAware {
         }
 
 
+
         //init button listener
         val colorButton = findViewById<ImageButton>(R.id.color)
         colorButton?.setOnClickListener {
@@ -67,21 +68,29 @@ class MainActivity : AppCompatActivity(), KodeinAware {
             }
         }
         val cancelButton = findViewById<ImageButton>(R.id.cancel)
-        cancelButton?.setOnClickListener{
+        cancelButton?.setOnClickListener {
             mainViewModel.clearPaths()
         }
         val downloadButton = findViewById<ImageButton>(R.id.download)
-        downloadButton?.setOnClickListener{
+        downloadButton?.setOnClickListener {
             val pics = findViewById<CanvasView>(R.id.canvasView)
             requestWritePermission() // need to refactor requests
-            if(hasFilePermission()){
+            if (hasFilePermission()) {
                 val metrics = DisplayMetrics()
                 windowManager.defaultDisplay.getMetrics(metrics)
-                bitmapExportManager.saveBitmap(this, mainViewModel.getPaths().value, metrics.widthPixels, metrics.heightPixels )
+                bitmapExportManager.saveBitmap(
+                    this,
+                    mainViewModel.getPaths().value,
+                    metrics.widthPixels,
+                    metrics.heightPixels
+                )
 
             }
         }
+
+
     }
+
     private fun requestWritePermission() {
         ActivityCompat.requestPermissions(
             this,
@@ -94,13 +103,44 @@ class MainActivity : AppCompatActivity(), KodeinAware {
         return ContextCompat.checkSelfPermission(
             this,
             Manifest.permission.WRITE_EXTERNAL_STORAGE
-        )  == PackageManager.PERMISSION_GRANTED
+        ) == PackageManager.PERMISSION_GRANTED
     }
 
-//    private fun createBitmapFromView(view: View): Bitmap{
+    //    private fun createBitmapFromView(view: View): Bitmap{
 //        val bitmap = Bitmap.createBitmap(view.measuredWidth, view.measuredHeight, Bitmap.Config.ARGB_8888)
 //        view.draw(Canvas(bitmap))
 //        return bitmap
-//    }
 
+
+    override fun onShake() {
+        ShakeDetector.unRegisterForShakeEvent(this)
+        showDialog()
+    }
+
+    private fun showDialog() {
+        // Initialize a new instance of alert dialog builder object
+        var builder = AlertDialog.Builder(this).setMessage("Are you sure you want to delete your work permamently? ")
+
+        val dialogClickListener = DialogInterface.OnClickListener { _, which ->
+            when (which) {
+               DialogInterface.BUTTON_POSITIVE -> {mainViewModel.clearPaths()
+                ShakeDetector.registerForShakeEvent(this)}
+                DialogInterface.BUTTON_NEUTRAL -> ShakeDetector.registerForShakeEvent(this)
+            }
+        }
+        builder.setPositiveButton("YES", dialogClickListener)
+        builder.setNeutralButton("CANCEL", dialogClickListener)
+        dialog = builder.create()
+        dialog.show()
+    }
+
+    override fun onPause() {
+        ShakeDetector.unRegisterForShakeEvent(this)
+        super.onPause()
+    }
+
+    override fun onResume() {
+        ShakeDetector.registerForShakeEvent(this)
+        super.onResume()
+    }
 }
