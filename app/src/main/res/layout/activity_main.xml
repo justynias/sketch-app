@@ -20,9 +20,9 @@
                 app:layout_constraintHeight_percent=".9"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toTopOf="parent"
-                app:size="@{viewModel.size}"
                 app:color="@{viewModel.color}"
-                app:paths="@{viewModel.paths}"/>
+                app:paths="@{viewModel.paths}"
+                app:size="@{viewModel.size}"/>
 
 
         <androidx.appcompat.widget.Toolbar

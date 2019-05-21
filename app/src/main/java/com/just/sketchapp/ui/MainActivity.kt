@@ -4,6 +4,8 @@ import android.Manifest
 import android.content.Context
 import android.content.DialogInterface
 import android.content.pm.PackageManager
+import android.graphics.Bitmap
+import android.graphics.Canvas
 import android.hardware.Sensor
 import android.hardware.SensorEventListener
 import android.hardware.SensorListener
@@ -19,6 +21,8 @@ import org.kodein.di.KodeinAware
 import org.kodein.di.android.kodein
 import org.kodein.di.generic.instance
 import android.util.DisplayMetrics
+import android.view.View
+import android.widget.Toast
 import androidx.appcompat.app.AlertDialog
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
@@ -28,6 +32,7 @@ import com.just.sketchapp.dialog.BitmapExportManager
 import com.just.sketchapp.dialog.ColorPickerManager
 import com.todo.shakeit.core.ShakeDetector
 import com.todo.shakeit.core.ShakeListener
+import kotlinx.android.synthetic.main.activity_main.*
 
 
 private const val MY_PERMISSION_WRITE_EXTERNAL_STORAGE = 1
@@ -58,8 +63,6 @@ class MainActivity : AppCompatActivity(), KodeinAware,  ShakeListener {
             this.executePendingBindings()
         }
 
-
-
         //init button listener
         val colorButton = findViewById<ImageButton>(R.id.color)
         colorButton?.setOnClickListener {
@@ -76,15 +79,8 @@ class MainActivity : AppCompatActivity(), KodeinAware,  ShakeListener {
             val pics = findViewById<CanvasView>(R.id.canvasView)
             requestWritePermission() // need to refactor requests
             if (hasFilePermission()) {
-                val metrics = DisplayMetrics()
-                windowManager.defaultDisplay.getMetrics(metrics)
-                bitmapExportManager.saveBitmap(
-                    this,
-                    mainViewModel.getPaths().value,
-                    metrics.widthPixels,
-                    metrics.heightPixels
-                )
-
+                if(bitmapExportManager.saveBitmap(this, canvasView))
+                    Toast.makeText(this, "Saved successfully", Toast.LENGTH_SHORT).show()
             }
         }
 
@@ -105,11 +101,6 @@ class MainActivity : AppCompatActivity(), KodeinAware,  ShakeListener {
             Manifest.permission.WRITE_EXTERNAL_STORAGE
         ) == PackageManager.PERMISSION_GRANTED
     }
-
-    //    private fun createBitmapFromView(view: View): Bitmap{
-//        val bitmap = Bitmap.createBitmap(view.measuredWidth, view.measuredHeight, Bitmap.Config.ARGB_8888)
-//        view.draw(Canvas(bitmap))
-//        return bitmap
 
 
     override fun onShake() {

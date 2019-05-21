@@ -3,9 +3,8 @@ import android.graphics.Color
 import android.widget.SeekBar
 import androidx.lifecycle.*
 import com.just.sketchapp.data.FingerPath
-import com.just.sketchapp.data.PaintModel
 
-class MainViewModel(private val paintModel: PaintModel): ViewModel() {
+class MainViewModel: ViewModel() {
 
     private var _paths  = MutableLiveData<MutableList<FingerPath>?>()
     private val _color = MutableLiveData<Int?>()
@@ -13,8 +12,7 @@ class MainViewModel(private val paintModel: PaintModel): ViewModel() {
     init{
         _color.value = Color.RED
         _paths.value = mutableListOf()
-        _size.value =30
-
+         _size.value =30
 
     }
 

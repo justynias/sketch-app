@@ -8,16 +8,7 @@ import android.view.MotionEvent
 import com.just.sketchapp.data.FingerPath
 import kotlin.math.absoluteValue
 import android.graphics.Bitmap
-import android.provider.MediaStore
-import android.util.Log
-
 import androidx.annotation.ColorInt
-import androidx.databinding.InverseMethod
-import androidx.lifecycle.LifecycleOwner
-import androidx.lifecycle.LiveData
-import androidx.lifecycle.Observer
-import com.just.sketchapp.R
-import java.lang.Exception
 
 
 class CanvasView(context: Context, attr: AttributeSet?): View(context, attr){
@@ -36,12 +27,6 @@ class CanvasView(context: Context, attr: AttributeSet?): View(context, attr){
     private var bitmapPaint: Paint = Paint(Paint.DITHER_FLAG)
 
 
-
-    fun createBitmapFromView(): Canvas{
-
-         mCanvas.drawBitmap(bitmap, 0.0f, 0.0f,  bitmapPaint)
-        return mCanvas
-    }
 
     fun setColor(@ColorInt color: Int) {
         brushColor = color

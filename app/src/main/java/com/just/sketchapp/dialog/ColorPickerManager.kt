@@ -10,7 +10,6 @@ import com.skydoves.colorpickerview.listeners.ColorEnvelopeListener
 class ColorPickerManager {
 
     fun showColorPicker(context: Context, onConfirmButton: (Int) -> Unit) {
-       // val header = context.getString(R.string.dialog_choose_color_header)
 
         ColorPickerDialog.Builder(context, R.style.Theme_AppCompat_Dialog_Alert)
             .setTitle("Choose your brush color")
